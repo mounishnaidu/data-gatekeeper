@@ -1,0 +1,71 @@
+{
+  "seed": 42,
+  "injections": [
+    {
+      "kind": "category_case_whitespace",
+      "target": "mqls.origin",
+      "count": 118,
+      "detail": "variants like ['Paid_Search', 'PAID_SEARCH', ' paid_search', 'Unknown']... on 118 rows"
+    },
+    {
+      "kind": "bad_date_format",
+      "target": "mqls.first_contact_date",
+      "count": 30,
+      "detail": "30 rows rewritten as MM/DD/YYYY instead of YYYY-MM-DD"
+    },
+    {
+      "kind": "unparseable_date",
+      "target": "mqls.first_contact_date",
+      "count": 10,
+      "detail": "10 rows set to the literal string 'not-a-date'"
+    },
+    {
+      "kind": "padded_join_key",
+      "target": "mqls.mql_id",
+      "count": 20,
+      "detail": "20 mql_ids wrapped in spaces \u2014 will fail an exact join"
+    },
+    {
+      "kind": "exact_duplicate_rows",
+      "target": "mqls",
+      "count": 50,
+      "detail": "50 rows duplicated verbatim and appended (after all other edits)"
+    },
+    {
+      "kind": "orphan_join_key",
+      "target": "deals.mql_id",
+      "count": 3,
+      "detail": "3 deals with mql_ids matching no MQL row"
+    },
+    {
+      "kind": "impossible_date_order",
+      "target": "deals.won_date",
+      "count": 4,
+      "detail": "4 injected + 1 pre-existing in source data = 5 total won_date-earlier-than-first_contact rows; injected mql_ids: ['d5cb61eef98bd237e41bc2225263f823', '1bd7d4eac464cde6f86349cbe0d61385', '5b6359f4589fe6e5a4856110f0480240', 'e73b38ff519142fdc3723ddf4a3a5825']"
+    },
+    {
+      "kind": "category_case_whitespace",
+      "target": "deals.business_segment",
+      "count": 10,
+      "detail": "10 business_segment values uppercased"
+    },
+    {
+      "kind": "exact_duplicate_rows",
+      "target": "deals",
+      "count": 5,
+      "detail": "5 deal rows duplicated verbatim and appended (after all other edits)"
+    },
+    {
+      "kind": "pre_existing_dirt",
+      "target": "source data",
+      "count": 0,
+      "detail": "Source data already contained: ~60 blank origins, 1 won_date < first_contact_date, and ~779 blank has_company values \u2014 the gatekeeper should surface these as genuine findings, not injections."
+    },
+    {
+      "kind": "injection_interaction",
+      "target": "impossible_date_order x unparseable_date",
+      "count": 1,
+      "detail": "One injected impossible-date row sits on an MQL whose first_contact date is 'not-a-date', so date-order can't be evaluated for it \u2014 it is correctly caught only as unparseable. Detectable impossible-date total: 3 injected + 1 pre-existing = 4."
+    }
+  ]
+}
