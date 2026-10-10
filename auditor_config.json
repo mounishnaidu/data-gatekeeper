@@ -1,0 +1,31 @@
+{
+  "deals_csv": "/home/hatch/workspace/data-gatekeeper/clean/deals_clean.csv",
+  "min_volume_for_flag": 100,
+  "mqls_csv": "/home/hatch/workspace/data-gatekeeper/clean/mqls_clean.csv",
+  "name": "Olist MQL -> Won (gatekeeper-cleaned)",
+  "outperform_ratio": 1.3,
+  "slice_dims": [
+    "origin",
+    "business_segment",
+    "lead_type",
+    "lead_behaviour_profile"
+  ],
+  "stages": [
+    {
+      "description": "Marketing qualified lead (every row in the MQL table)",
+      "name": "MQL"
+    },
+    {
+      "description": "MQL that has a matching row in the closed-deals table",
+      "name": "Won"
+    }
+  ],
+  "underperform_ratio": 0.7,
+  "unknown_markers": [
+    "unknown",
+    "",
+    "n/a",
+    "na",
+    "none"
+  ]
+}
