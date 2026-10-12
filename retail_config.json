@@ -1,0 +1,25 @@
+{
+  "categorical_cols": [
+    "Country",
+    "Description"
+  ],
+  "join": null,
+  "name": "UCI Online Retail (real-world messy, single table)",
+  "tables": {
+    "lines": {
+      "date_cols": [
+        "InvoiceDate"
+      ],
+      "datetime_formats": {
+        "InvoiceDate": "%Y-%m-%d %H:%M:%S"
+      },
+      "key": "InvoiceNo",
+      "path": "/home/hatch/workspace/datasets/online-retail/OnlineRetail.csv",
+      "encoding": "latin1"
+    }
+  },
+  "non_negative_cols": [
+    "Quantity",
+    "UnitPrice"
+  ]
+}
