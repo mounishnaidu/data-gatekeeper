@@ -21,8 +21,9 @@ class Issue:
 def _load_tables(config):
     tables = {}
     for name, spec in config["tables"].items():
-        tables[name] = pd.read_csv(spec["path"], dtype=str).fillna("")
-        # keep a raw copy for byte-level checks; work on stripped-later copies
+        tables[name] = pd.read_csv(
+            spec["path"], dtype=str,
+            encoding=spec.get("encoding", "utf-8")).fillna("")
     return tables
 
 
@@ -54,7 +55,34 @@ def check_missingness(tables, join) -> list[Issue]:
     (P(missing | won==0) ~= 1) lives on the won side of the join — e.g. deal
     attributes that only exist for won deals. That is structure, not dirt:
     no fix is proposed. Anything else is genuine dirt.
+
+    With join=None (single table, no funnel context) there is no structural
+    test to run — missingness is reported and left for a human decision.
+    Auto-dropping would be the naive-cleaner mistake.
     """
+    if join is None:
+        # Single table, no funnel context: report missingness per column,
+        # no structural verdict possible. Human decides.
+        out = []
+        for name, df in tables.items():
+            for col in df.columns:
+                n_missing = int((df[col].fillna("") == "").sum())
+                if not n_missing:
+                    continue
+                out.append(Issue(
+                    title=f"Missing values: {col} ({name})",
+                    severity="info",
+                    summary=(f"{n_missing:,} of {len(df):,} rows ({n_missing/len(df):.1%}) "
+                             f"missing {col}. No join context, so no "
+                             f"structural verdict — a human decides whether "
+                             f"this is dirt, structure, or 'unknown'."),
+                    evidence={"table": name, "column": col,
+                              "missing": n_missing,
+                              "missing_share": round(n_missing / len(df), 4)},
+                    how_checked=("per-column blank count; no funnel join "
+                                 "configured, structural test skipped"),
+                ))
+        return out
     left = tables[join["left"]].copy()
     right = tables[join["right"]].copy()
     key = join["key"]
@@ -267,15 +295,49 @@ def check_date_order(tables, join, config) -> list[Issue]:
     return []
 
 
+def check_non_negative(tables, cols) -> list[Issue]:
+    """Numeric sanity: negative values where they shouldn't be.
+
+    No auto-fix is ever proposed — a negative quantity on a cancellation
+    invoice is structure, on a normal invoice it's dirt. Human call.
+    """
+    out = []
+    for name, df in tables.items():
+        for col in cols:
+            if col not in df.columns:
+                continue
+            vals = pd.to_numeric(df[col].fillna(""), errors="coerce")
+            neg = vals < 0
+            n = int(neg.sum())
+            if n:
+                out.append(Issue(
+                    title=f"Negative values: {name}.{col}",
+                    severity="warning",
+                    summary=(f"{n:,} of {len(df):,} rows have {col} < 0. On "
+                             f"cancellation/return records that's structure; "
+                             f"anywhere else it's dirt. Left for a human "
+                             f"decision — no automatic fix."),
+                    evidence={"table": name, "column": col,
+                              "negative_count": n,
+                              "min_value": float(vals.min())},
+                    how_checked=(f"pd.to_numeric({col}); count of values < 0"),
+                ))
+    return out
+
+
 def profile(config) -> tuple[list[Issue], dict]:
     """Run every check. Returns (issues, tables). Read-only."""
     tables = _load_tables(config)
+    join = config.get("join")
     issues: list[Issue] = []
     issues += check_duplicates(tables)
-    issues += check_keys(tables, config["join"])
+    if join is not None:
+        issues += check_keys(tables, join)
     issues += check_categories(tables, config.get("categorical_cols", []))
     issues += check_dates(tables, config)
-    issues += check_missingness(tables, config["join"])
-    issues += check_date_order(tables, config["join"], config)
+    issues += check_non_negative(tables, config.get("non_negative_cols", []))
+    issues += check_missingness(tables, join)
+    if join is not None:
+        issues += check_date_order(tables, join, config)
     order = {"critical": 0, "warning": 1, "info": 2}
     return sorted(issues, key=lambda i: order[i.severity]), tables
