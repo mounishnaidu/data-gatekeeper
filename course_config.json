@@ -1,0 +1,32 @@
+{
+  "name": "Online course enrollments (single table)",
+  "join": null,
+  "tables": {
+    "enrollments": {
+      "path": "/home/hatch/workspace/datasets/course/online_course_completion_analytics.csv",
+      "key": "enrollment_id",
+      "encoding": "utf-8",
+      "date_cols": [
+        "enrollment_date",
+        "last_activity_date",
+        "completion_date"
+      ],
+      "datetime_formats": {}
+    }
+  },
+  "categorical_cols": [
+    "course_category",
+    "platform_name",
+    "course_level",
+    "student_country",
+    "student_gender",
+    "education_level",
+    "employment_status",
+    "completion_status"
+  ],
+  "non_negative_cols": [
+    "time_spent_hours",
+    "login_count",
+    "lessons_completed"
+  ]
+}
