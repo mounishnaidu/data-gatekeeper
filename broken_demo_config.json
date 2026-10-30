@@ -1,0 +1,15 @@
+{
+  "name": "Broken multi-stage demo (single table)",
+  "join": null,
+  "tables": {
+    "demo": {
+      "path": "/home/hatch/workspace/funnel-auditor/demo_multistage/broken_multistage.csv",
+      "key": "user_id",
+      "encoding": "utf-8",
+      "date_cols": ["signup_date", "paid_date"],
+      "datetime_formats": {}
+    }
+  },
+  "categorical_cols": ["channel", "stage"],
+  "non_negative_cols": []
+}
