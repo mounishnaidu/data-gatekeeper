@@ -92,7 +92,7 @@ demo_config.json      # two-table demo (Olist, join on mql_id)
 retail_config.json    # single-table demo (Online Retail, join: null)
 course_config.json    # single-table demo (course enrollments, join: null)
 make_messy.py         # manufacture the dirty demo data (seeded)
-demo_data/            # dirty CSVs + manifest.json (ground truth)
+demo_data/            # dirty CSVs + manifest.json (known answer key)
 auditor_config.json   # funnel-auditor config pointed at clean/
 clean/                # cleaned output (generated)
 ```
