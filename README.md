@@ -4,6 +4,18 @@ Decide whether a dataset is fit to analyze — *before* it is. The upstream step
 
 Built by **Mounish Naidu** with **Shadow**.
 
+## The problem it solves
+
+Every business decision is only as good as the data behind it, and marketing data is almost always messy — duplicate records, the same channel spelled five ways, dates in three formats, customer IDs that don't match between systems. Worse, most cleaning tools "fix" data silently: they delete rows and fill in blanks without asking, which can destroy good data and hide real problems. The result: businesses spend real money based on numbers that are wrong, without ever knowing it.
+
+## How it helps a business
+
+- **Catch bad data before it causes bad decisions.** Problems are found and proven with evidence before any analysis runs on the data.
+- **Never "fix" what isn't broken.** It tells genuinely dirty data apart from data that only looks odd (like a missing date on a deal that never closed), so good data is never corrupted by cleaning.
+- **Keep a human in charge.** Every change needs approval, shows exactly what it touches, and can be undone. Nothing changes silently.
+- **Preserve the evidence.** Rows that can't be trusted are set aside with a reason, not deleted — so nothing is ever lost and every exclusion can be reviewed.
+- **Avoid the expensive mistake.** One wrong budget decision based on dirty data costs far more than the minutes this check takes.
+
 ## The idea
 
 Auto-cleaning agents silently corrupt data: they impute what shouldn't be imputed and "fix" structure that is actually correct. This one is built the other way around:
