@@ -28,9 +28,16 @@ def _record(log, key, title, before, after, detail=""):
 
 
 def apply_fixes(tables, config, approved_keys) -> tuple[dict, dict, pd.DataFrame]:
-    """Returns (cleaned_tables, log, quarantine_df)."""
+    """Returns (cleaned_tables, log, quarantine_df).
+
+    Single-table configs (join: null) skip every join-dependent fix:
+    strip_keys, quarantine_orphans, quarantine_impossible_dates. The
+    table-local fixes (normalize_categories, fix_dates, drop_duplicates)
+    run the same either way.
+    """
     log = _log()
-    key = config["join"]["key"]
+    join_cfg = config.get("join")
+    key = join_cfg["key"] if join_cfg else None
     tables = {n: df.copy() for n, df in tables.items()}
     quarantine_parts = []
 
@@ -39,7 +46,7 @@ def apply_fixes(tables, config, approved_keys) -> tuple[dict, dict, pd.DataFrame
         d["_quarantine_reason"] = reason
         return d
 
-    if "strip_keys" in approved_keys:
+    if "strip_keys" in approved_keys and key is not None:
         n = 0
         for name, df in tables.items():
             s = df[key].fillna("")
@@ -109,7 +116,7 @@ def apply_fixes(tables, config, approved_keys) -> tuple[dict, dict, pd.DataFrame
                 sum(map(len, tables.values())),
                 f"{dropped} duplicate rows dropped")
 
-    if "quarantine_orphans" in approved_keys:
+    if "quarantine_orphans" in approved_keys and join_cfg is not None:
         left, right = tables[config["join"]["left"]], tables[config["join"]["right"]]
         l_keys = set(left[key].fillna("").str.strip())
         mask = ~right[key].fillna("").str.strip().isin(l_keys)
@@ -121,7 +128,7 @@ def apply_fixes(tables, config, approved_keys) -> tuple[dict, dict, pd.DataFrame
                 len(right) + 0, len(tables[config["join"]["right"]]),
                 f"{n} orphan rows quarantined (not deleted)")
 
-    if "quarantine_impossible_dates" in approved_keys:
+    if "quarantine_impossible_dates" in approved_keys and join_cfg is not None:
         lspec, rspec = (config["tables"][config["join"]["left"]],
                         config["tables"][config["join"]["right"]])
         lc, rc = lspec["date_cols"][0], rspec["date_cols"][0]
