@@ -60,7 +60,7 @@ python3 cli.py clean --config demo_config.json --yes        # auto-approve (scri
 | Missingness | empty by design (left alone) vs genuinely missing data |
 | Non-negative values | negative numbers where they can't be real (quantities, prices) |
 
-Single-table datasets work too: if your data is one table instead of two linked tables, set `join: null`. The link-related checks are skipped, and empty columns are reported without a verdict — a human decides.
+Single-table datasets work too: if your data is one table instead of two linked tables, set `join: null`. The link-related checks are skipped, and empty columns are reported without a verdict — a human decides. Clean works the same way on one table: the link-dependent fixes are skipped, and the fixes that only touch one table (spelling, dates, duplicates) run as normal.
 
 ## The demo: manufactured dirt, honest grading
 
